@@ -1,0 +1,26 @@
+<mat-card class="profile-card">
+  <mat-card-header>
+    <!-- Avatar & Online Badge Status Indicator -->
+    <div class="avatar-container">
+      <img [src]="user.avatarUrl" alt="User Avatar" class="profile-avatar" data-testid="avatar-img" />
+      <span class="status-badge" [ngClass]="user.isOnline ? 'online' : 'offline'" data-testid="status-indicator"></span>
+    </div>
+    
+    <!-- User Info Displays -->
+    <mat-card-title data-testid="user-name">{{ user.name }}</mat-card-title>
+    <mat-card-subtitle data-testid="user-email">{{ user.email }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <!-- Feature Actions Section -->
+  <mat-card-actions class="action-buttons">
+    <button mat-stroked-button color="primary" (click)="toggleOnline()" data-testid="btn-toggle">
+      Toggle Status
+    </button>
+    <button mat-stroked-button (click)="changeAvatar()" data-testid="btn-avatar">
+      Change Avatar
+    </button>
+    <button mat-flat-button (click)="updateUser('Alex Smith', 'alex.smith@example.com')" data-testid="btn-update">
+      Update Profile Info
+    </button>
+  </mat-card-actions>
+</mat-card>
