@@ -1,0 +1,13 @@
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DiscountService {
+
+  constructor() { }
+
+  getDiscount(): number {
+    return 15;
+  }
+}
