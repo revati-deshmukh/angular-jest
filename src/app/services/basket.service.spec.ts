@@ -9,17 +9,17 @@ describe('BasketService', () => {
 
   beforeEach(() => {
     discountServiceMock = {
-      getDiscount: jest.fn().mockReturnValue(15),
+      getDiscount: jest.fn(),
     } as unknown as jest.Mocked<DiscountService>;
 
     TestBed.configureTestingModule({
-      // providers: [
-      //   BasketService,
-      //   {
-      //     provide: DiscountService,
-      //     useValue: discountServiceMock,
-      //   },
-      // ],
+      providers: [
+        BasketService,
+        {
+          provide: DiscountService,
+          useValue: discountServiceMock,
+        },
+      ],
     });
     basketService = TestBed.inject(BasketService);
   });
@@ -29,15 +29,15 @@ describe('BasketService', () => {
   });
 
   it('should calculate the price using the mocked discount', () => {
-    // discountServiceMock.getDiscount.mockReturnValue(15);
-    discountServiceMock.getDiscount();
+    discountServiceMock.getDiscount.mockReturnValue(15);
+    // discountServiceMock.getDiscount();
     const result = basketService.calculate(100);
     expect(result).toBe(85);
   });
 
   it('should call getDiscount exactly once', () => {
-    // discountServiceMock.getDiscount.mockReturnValue(15);
-    discountServiceMock.getDiscount(15);
+    discountServiceMock.getDiscount.mockReturnValue(15);
+    // discountServiceMock.getDiscount(15);
     basketService.calculate(100);
     expect(discountServiceMock.getDiscount).toHaveBeenCalled();
   });
