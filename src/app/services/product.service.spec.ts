@@ -11,13 +11,21 @@ describe('ProductService', () => {
     get: jest.fn(),
   };
 
+  const mockLoggerService = {
+    info: jest.fn(),
+    warning: jest.fn(),
+    error: jest.fn(),
+  };
+
   beforeEach(() => {
     mockApi.get.mockReset();
+    jest.clearAllMocks();
 
     TestBed.configureTestingModule({
       providers: [
-        ProductService, 
-        { provide: ApiService, useValue: mockApi }
+        ProductService,
+        { provide: ApiService, useValue: mockApi },
+        { provide: LogService, useValue: mockLoggerService },
       ],
     });
     service = TestBed.inject(ProductService);
@@ -81,6 +89,7 @@ describe('ProductService', () => {
       service.addProduct(product);
 
       expect(service.products).toContain(product);
+      expect(mockLoggerService.info).toHaveBeenCalledTimes(1);
     });
 
     it('should increase the product count when a product is added', () => {
@@ -94,6 +103,7 @@ describe('ProductService', () => {
       service.addProduct(product);
 
       expect(service.products).toHaveLength(1);
+      expect(mockLoggerService.info).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -134,6 +144,7 @@ describe('ProductService', () => {
       service.removeProduct(999);
 
       expect(service.products).toEqual([product]);
+      expect(mockLoggerService.info).toHaveBeenCalledTimes(2);
     });
   });
 
