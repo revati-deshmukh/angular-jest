@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 import { LogService } from './log.service';
-import { DiscountService } from './discount.service';
 
 export interface Product {
-  id : number;
+  id: number;
   name: string;
-  price: number; 
-  quantity: number;
+  price: number;
+  imageSrc: string;
+}
+
+export interface CartItem extends Product {
+  quantity?: number;
 }
 
 @Injectable({
@@ -18,7 +21,6 @@ export class ProductService {
 
   constructor(
     private api: ApiService,
-    private discountService: DiscountService,
     private loggerService: LogService,
   ) {}
 
@@ -51,25 +53,8 @@ export class ProductService {
     );
   }
 
-  calculateVat(): number {
-    const subtotal = this.calculateSubtotal();
-    const discount = this.discountService.getDiscount();
-    const discountedTotal = subtotal - (subtotal * discount) / 100;
-
-    return discountedTotal * 0.23;
-  }
-
-  calculateGrandTotal(): number {
-    const subtotal = this.calculateSubtotal();
-    const discount = this.discountService.getDiscount();
-    const discountAmount = (subtotal * discount) / 100;
-    const discountedTotal = subtotal - discountAmount;
-    const vat = discountedTotal * 0.23;
-
-    return discountedTotal + vat;
-  }
-
-  clearBasket() {
+  clearBasket(): void {
     this.products = [];
+    this.loggerService.info('Basket cleared');
   }
 }

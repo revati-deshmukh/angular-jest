@@ -1,161 +1,298 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ShoppingCartComponent } from './shopping-cart.component';
+import { CartItem, Product, ProductService } from '../services/product.service';
+import { DiscountService } from '../services/discount.service';
+import { PriceService } from '../services/price.service';
+import { ShippingService } from '../services/shipping.service';
 
 describe('ShoppingCartComponent', () => {
   let component: ShoppingCartComponent;
   let fixture: ComponentFixture<ShoppingCartComponent>;
 
+  let mockProductService: {
+    loadProducts: jest.Mock;
+  };
+
+  let mockDiscountService: {
+    getDiscount: jest.Mock;
+  };
+
+  let mockPriceService: {
+    addVat: jest.Mock;
+  };
+
+  let mockShippingService: {
+    calculateShipping: jest.Mock;
+  };
+
   beforeEach(async () => {
+    mockProductService = {
+      loadProducts: jest.fn(),
+    };
+
+    mockDiscountService = {
+      getDiscount: jest.fn().mockReturnValue(15),
+    };
+
+    mockPriceService = {
+      addVat: jest.fn().mockImplementation((price) => price * 1.23),
+    };
+
+    mockShippingService = {
+      calculateShipping: jest.fn().mockReturnValue(10),
+    };
+
     await TestBed.configureTestingModule({
       imports: [ShoppingCartComponent],
+      providers: [
+        {
+          provide: ProductService,
+          useValue: mockProductService,
+        },
+        {
+          provide: DiscountService,
+          useValue: mockDiscountService,
+        },
+        {
+          provide: PriceService,
+          useValue: mockPriceService,
+        },
+        {
+          provide: ShippingService,
+          useValue: mockShippingService,
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ShoppingCartComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    //fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should start with an empty cart', () => {
+    expect(component.cartItems()).toEqual([]);
+  });
+
   describe('addToCart', () => {
-    it('should add an item to the cart', () => {
-      const item = component.shopItems[0];
-      component.addToCart(item);
-      expect(component.cartItems.length).toBe(1);
-      expect(component.cartItems[0].title).toBe(item.title);
+    it('should add a product to the cart', () => {
+      const product: Product = {
+        id: 1,
+        name: 'T-Shirt',
+        price: 20,
+        imageSrc: 'assets/cat.jpg',
+      };
+
+      component.addToCart(product);
+      expect(component.cartItems()).toEqual([
+        {
+          id: 1,
+          name: 'T-Shirt',
+          price: 20,
+          imageSrc: 'assets/cat.jpg',
+          quantity: 1,
+        },
+      ]);
     });
 
-    it('should add the item with quantity 1', () => {
-      const item = component.shopItems[0];
-      component.addToCart(item);
-      expect(component.cartItems[0].quantity).toBe(1);
-    });
+    it('should not add the same product twice', () => {
+      const product: CartItem = {
+        id: 1,
+        name: 'T-Shirt',
+        price: 20,
+        imageSrc: 'assets/cat.jpg',
+      };
 
-    it('should not add the same item twice', () => {
-      const item = component.shopItems[0];
-
-      const alertSpy = jest
-        .spyOn(window, 'alert')
-        .mockImplementation(() => {});
-
-      component.addToCart(item);
-      component.addToCart(item);
-
-      expect(component.cartItems.length).toBe(1);
-
-      expect(alertSpy).toHaveBeenCalledWith(
-        'This item is already added to the cart'
-      );
-
-      alertSpy.mockRestore();
+      component.addToCart(product);
+      component.addToCart(product);
+      expect(component.cartItems()).toHaveLength(1);
+      expect(component.cartItems()[0].quantity).toBe(1);
     });
   });
 
   describe('removeCartItem', () => {
-    it('should remove an item from the cart', () => {
-      component.addToCart(component.shopItems[0]);
-      component.addToCart(component.shopItems[1]);
-      expect(component.cartItems.length).toBe(2);
-      component.removeCartItem(0);
-      expect(component.cartItems.length).toBe(1);
-      expect(component.cartItems[0].title).toBe(component.shopItems[1].title);
+    it('should remove a product from the cart', () => {
+      const product: CartItem = {
+        id: 1,
+        name: 'T-Shirt',
+        price: 20,
+        imageSrc: 'assets/cat.jpg',
+      };
+
+      component.addToCart(product);
+
+      component.removeCartItem(1);
+
+      expect(component.cartItems()).toHaveLength(0);
+    });
+
+    // it('should return if cartItem is empty', () => {
+    //   component.removeCartItem(1);
+
+    //   expect(component.cartItems()[0].quantity).toBe(1);
+    // });
+  });
+
+  describe('updateQuantity', () => {
+    it('should update product quantity', () => {
+      const product: CartItem = {
+        id: 1,
+        name: 'T-Shirt',
+        price: 20,
+        imageSrc: 'assets/cat.jpg',
+      };
+
+      component.addToCart(product);
+      component.updateQuantity(1, 3);
+
+      expect(component.cartItems()[0].quantity).toBe(3);
+    });
+
+    it('should reset invalid product quantity', () => {
+      const product: CartItem = {
+        id: 1,
+        name: 'T-Shirt',
+        price: 20,
+        imageSrc: 'assets/cat.jpg',
+      };
+
+      component.addToCart(product);
+      component.updateQuantity(1, 0);
+
+      expect(component.cartItems()[0].quantity).toBe(1);
+    });
+
+    it('should reset invalid product quantity', () => {
+      const product: CartItem = {
+        id: 1,
+        name: 'T-Shirt',
+        price: 20,
+        imageSrc: 'assets/cat.jpg',
+      };
+
+      component.addToCart(product);
+      component.updateQuantity(1, 0);
+
+      expect(component.cartItems()[0].quantity).toBe(1);
+    });
+
+    it('should reset Nan quantity to 1', () => {
+      const product: CartItem = {
+        id: 1,
+        name: 'T-Shirt',
+        price: 20,
+        imageSrc: 'assets/cat.jpg',
+      };
+
+      component.addToCart(product);
+      component.updateQuantity(1, NaN);
+
+      expect(component.cartItems()[0].quantity).toBe(1);
     });
   });
 
-  describe('quantityChanged', () => {
-    it('should update the quantity', () => {
-      const item = component.shopItems[0];
-      component.addToCart(item);
-      const input = document.createElement('input');
-      input.value = '3';
-      const event = { target: input } as unknown as Event;
-      component.quantityChanged(event, item);
-      expect(item.quantity).toBe(3);
-    });
+  describe('subtotal', () => {
+    it('should calculate subtotal', () => {
+      component.cartItems.set([
+        {
+          id: 1,
+          name: 'T-Shirt',
+          price: 20,
+          imageSrc: 'assets/cat.jpg',
+          quantity: 2,
+        },
+        {
+          id: 2,
+          name: 'Hoodie',
+          price: 35,
+          imageSrc: 'assets/bird1.jpg',
+          quantity: 1,
+        },
+      ]);
 
-    it('should set quantity to 1 when quantity is zero', () => {
-      const item = component.shopItems[0];
-      component.addToCart(item);
-      const input = document.createElement('input');
-      input.value = '0';
-      const event = { target: input } as unknown as Event;
-      component.quantityChanged(event, item);
-      expect(item.quantity).toBe(1);
-    });
-
-    it('should set quantity to 1 when quantity is negative', () => {
-      const item = component.shopItems[0];
-      component.addToCart(item);
-      const input = document.createElement('input');
-      input.value = '-5';
-      const event = { target: input } as unknown as Event;
-      component.quantityChanged(event, item);
-      expect(item.quantity).toBe(1);
+      expect(component.subtotal()).toBe(75);
     });
   });
 
-  describe('cartTotal', () => {
-    it('should calculate the total correctly', () => {
-      component.addToCart(component.shopItems[0]);
-      component.addToCart(component.shopItems[1]);
-      component.cartItems[0].quantity = 2;
-      component.cartItems[1].quantity = 3;
-      expect(component.cartTotal).toBe(70);
+  describe('discount', () => {
+    it('should calculate discount amount', () => {
+      component.cartItems.set([
+        {
+          id: 1,
+          name: 'T-Shirt',
+          price: 100,
+          imageSrc: 'assets/cat.jpg',
+          quantity: 1,
+        },
+      ]);
+
+      expect(component.discountPercentage.set(15));
+      expect(component.discountAmount()).toBe(15);
+      expect(component.discountedTotal()).toBe(85);
     });
   });
 
-  describe('purchaseClicked', () => {
-    it('should show the purchase message', () => {
-      const alertSpy = jest
-        .spyOn(window, 'alert')
-        .mockImplementation(() => {});
+  describe('grand total', () => {
+    it('should calculate grand total', () => {
+      component.cartItems.set([
+        {
+          id: 1,
+          name: 'T-Shirt',
+          price: 100,
+          imageSrc: 'assets/cat.jpg',
+          quantity: 1,
+        },
+      ]);
 
-      component.purchaseClicked();
+      component.discountPercentage.set(10);
 
-      expect(alertSpy).toHaveBeenCalledWith(
-        'Thank you for your purchase'
-      );
+      mockPriceService.addVat.mockReturnValue(110.7);
+      mockShippingService.calculateShipping.mockReturnValue(10);
 
-      alertSpy.mockRestore();
-    });
-
-    it('should empty the cart', () => {
-      component.addToCart(component.shopItems[0]);
-      component.addToCart(component.shopItems[1]);
-      expect(component.cartItems.length).toBe(2);
-      component.purchaseClicked();
-      expect(component.cartItems.length).toBe(0);
-    });
-
-    it('should reset the cart total to zero', () => {
-      component.addToCart(component.shopItems[0]);
-      component.purchaseClicked();
-      expect(component.cartTotal).toBe(0);
+      expect(component.grandTotal()).toBeCloseTo(120.7);
     });
   });
 
-  describe('template', () => {
-    it('should display shop items', () => {
-      const items = fixture.nativeElement.querySelectorAll('.shop-item');
-      expect(items.length).toBe(component.shopItems.length);
-    });
-
-    it('should display added cart items', () => {
-      component.addToCart(component.shopItems[0]);
+  describe('Template', () => {
+    it('should display empty basket when cart is empty', () => {
+      component.cartItems.set([]);
       fixture.detectChanges();
-      const rows = fixture.nativeElement.querySelectorAll('.cart-row');
-      expect(rows.length).toBe(1);
+
+      const ele = fixture.nativeElement.querySelector('.empty-message');
+
+      expect(ele).toBeTruthy();
+      expect(ele.textContent).toContain('Your basket is empty');
     });
 
-    it('should display the cart total', () => {
-      component.addToCart(component.shopItems[0]);
+    it('should display cart items', () => {
+      component.cartItems.set([
+        {
+          id: 1,
+          name: 'T-Shirt',
+          price: 20,
+          imageSrc: 'assets/cat.jpg',
+          quantity: 2,
+        },
+        {
+          id: 2,
+          name: 'Hoodie',
+          price: 35,
+          imageSrc: 'assets/bird1.jpg',
+          quantity: 1,
+        },
+      ]);
+
       fixture.detectChanges();
-      const total = fixture.nativeElement.querySelector('.cart-total-price');
-      expect(total.textContent.trim()).toBe('$20.00');
+
+      const elements = fixture.nativeElement.querySelectorAll('.cart-row');
+
+      expect(elements).toHaveLength(2);
+      expect(elements[0].textContent).toContain('T-Shirt');
+      expect(elements[1].textContent).toContain('Hoodie');
     });
   });
-
 });

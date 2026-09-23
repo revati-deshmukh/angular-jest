@@ -332,7 +332,15 @@
 <!-- * * * * * * * * * * End of Placeholder  * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 
-<app-shopping-cart></app-shopping-cart>
-<app-welcome></app-welcome>
+<app-shopping-cart [isPremium]="true"
+  (checkout)="completeCheckout($event)"></app-shopping-cart>
+<!-- <app-welcome></app-welcome>
 <app-user-profile></app-user-profile>
+<app-card>
+  <p>Hello World</p>
+</app-card> -->
+
+<!-- <app-counter (changed)="onChanged($event)"></app-counter>
+<h4>{{ parentValue }}</h4> -->
+<!-- <app-avatar [name]="user.name"></app-avatar> -->
 <router-outlet />

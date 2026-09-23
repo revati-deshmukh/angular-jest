@@ -15,6 +15,6 @@ describe('DiscountService', () => {
   });
 
   it('should calculate discount', () => {
-    expect(service.getDiscount()).toBe(15);
+    expect(service.getDiscountPercentage()).toBe(15);
   });
 });

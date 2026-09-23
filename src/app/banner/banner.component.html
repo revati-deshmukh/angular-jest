@@ -1,0 +1,9 @@
+<!-- <p>banner works!</p> -->
+
+<button (click)="clickFunction()">Click Me</button>
+
+@if(loading()) {
+    <p data-testid="loading-message"> Loading... </p>
+} @else {
+    <p data-testid="finished-message"> Finished </p>
+}

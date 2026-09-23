@@ -1,13 +1,18 @@
 import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DiscountService {
+  constructor() {}
 
-  constructor() { }
-
-  getDiscount(): number {
+  getDiscountPercentage(): number {
     return 15;
+  }
+
+  calculateDiscount(subtotal: number): number {
+    const discount = this.getDiscountPercentage();
+
+    return (subtotal * discount) / 100;
   }
 }

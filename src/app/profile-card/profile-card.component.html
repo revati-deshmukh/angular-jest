@@ -1,0 +1,20 @@
+<h2>{{ name }}</h2>
+<p>{{ email }}</p>
+<span>hi</span>
+
+
+<h1>{{ title() }}</h1>
+
+@if (loading()) {
+    <h4 data-testid="loading-message">Loading...</h4>
+} @else {
+    <h4 data-testid="loaded">Products Loaded</h4>
+}
+
+<ul>
+    @for (product of products(); track product.id) {
+    <li>{{ product.name }}</li>
+    }
+</ul>
+
+<h4 data-testid="doubled-count">{{ doubled() }}</h4>
