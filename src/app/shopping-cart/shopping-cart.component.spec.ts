@@ -295,4 +295,113 @@ describe('ShoppingCartComponent', () => {
       expect(elements[1].textContent).toContain('Hoodie');
     });
   });
-});
+
+  // Assignments
+  describe('Assignments', () => {
+    it('should remove 1 product from cart', () => {
+      component.cartItems.set([
+        {
+          id: 1,
+          name: 'T-Shirt',
+          price: 20,
+          imageSrc: 'assets/cat.jpg',
+          quantity: 2,
+        },
+        {
+          id: 2,
+          name: 'Hoodie',
+          price: 35,
+          imageSrc: 'assets/bird1.jpg',
+          quantity: 1,
+        },
+      ]);
+      fixture.detectChanges();
+      component.removeCartItem(2);
+      expect(component.cartItems().length).toEqual(1);
+      expect(component.cartItems()).toHaveLength(1);
+    });
+
+    it('should update quantity', () => {
+      const product: CartItem = {
+        id: 1,
+        name: 'T-Shirt',
+        price: 20,
+        imageSrc: 'assets/cat.jpg',
+      };
+
+      component.addToCart(product);
+      component.updateQuantity(1, 5);
+
+      expect(component.cartItems()[0].quantity).toBe(5);
+    });
+
+    it('should display invalid quantity', () => {
+      const product: CartItem = {
+        id: 1,
+        name: 'T-Shirt',
+        price: 20,
+        imageSrc: 'assets/cat.jpg',
+      };
+
+      component.addToCart(product);
+      component.updateQuantity(1, 0);
+
+      expect(component.cartItems()[0].quantity).toBe(1);
+    });
+
+    it('should display invalid quantity', () => {
+      const product: CartItem = {
+        id: 1,
+        name: 'T-Shirt',
+        price: 20,
+        imageSrc: 'assets/cat.jpg',
+      };
+
+      component.addToCart(product);
+      component.updateQuantity(1, NaN);
+
+      expect(component.cartItems()[0].quantity).toBe(1);
+    });
+
+    it('should calculate subtotal', () => {
+      component.cartItems.set([
+        {
+          id: 1,
+          name: 'T-Shirt',
+          price: 20,
+          imageSrc: 'assets/cat.jpg',
+          quantity: 2
+        },
+        {
+          id: 1,
+          name: 'Hoodie',
+          price: 35,
+          imageSrc: 'assets/cat.jpg',
+          quantity: 1
+        },
+      ]);
+
+      fixture.detectChanges();
+
+      expect(component.subtotal()).toBe(75);
+    });
+
+    it('calculate discount percentage', () => {
+      component.cartItems.set([
+        {
+          id: 1,
+          name: 'T-Shirt',
+          price: 100,
+          imageSrc: 'assets/cat.jpg',
+          quantity: 1,
+        },
+      ]);
+
+      component.discountPercentage.set(15);
+
+      const discountEle = fixture.nativeElement.querySelector('.discount-banner');
+      console.log(discountEle);
+      expect(discountEle.textContent).toContain('15%');
+    });
+  });
+};);
