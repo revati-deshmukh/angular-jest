@@ -10,14 +10,14 @@ export interface Product {
 }
 
 export interface CartItem extends Product {
-  quantity?: number;
+  quantity: number;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  products: Product[] = [];
+  products: CartItem[] = [];
 
   constructor(
     private api: ApiService,
@@ -28,7 +28,7 @@ export class ProductService {
     return this.api.get('/products');
   }
 
-  addProduct(product: Product) {
+  addProduct(product: CartItem) {
     this.products.push(product);
     this.loggerService.info('Product added');
   }

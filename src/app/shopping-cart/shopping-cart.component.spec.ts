@@ -398,6 +398,7 @@ describe('ShoppingCartComponent', () => {
       ]);
 
       component.discountPercentage.set(15);
+      fixture.detectChanges();
 
       const discountEle = fixture.nativeElement.querySelector('.discount-banner');
       console.log(discountEle);
