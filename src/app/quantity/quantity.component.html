@@ -1,0 +1,17 @@
+<button
+      type="button"
+      [disabled]="disabled"
+      (click)="decrease()"
+    >
+      -
+    </button>
+
+    <span>{{ value }}</span>
+
+    <button
+      type="button"
+      [disabled]="disabled"
+      (click)="increase()"
+    >
+      +
+    </button>

@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BannerComponent } from './banner.component';
 import { By } from '@angular/platform-browser';
 import { ComponentFixtureAutoDetect } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 describe('BannerComponent', () => {
   let component: BannerComponent;
@@ -12,6 +13,7 @@ describe('BannerComponent', () => {
   beforeEach(async () => {
     TestBed.configureTestingModule({
       providers: [{ provide: ComponentFixtureAutoDetect, useValue: true }],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
     });
 
     fixture = TestBed.createComponent(BannerComponent);
@@ -45,5 +47,11 @@ describe('BannerComponent', () => {
     expect(h1.textContent).toContain(oldTitle);
     await fixture.whenStable();
     expect(h1.textContent).toContain(newTitle);
+  });
+
+  it('should have skyblue <h1>', () => {
+    const h1: HTMLElement = fixture.nativeElement.querySelector('h1');
+    const bgColor = h1.style.backgroundColor;
+    expect(bgColor).toBe('skyblue');
   });
 });

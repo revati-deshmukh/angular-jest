@@ -1,8 +1,9 @@
 import { Component, OnInit, signal } from '@angular/core';
+import { HighlightDirective } from '../highlight.directive';
 
 @Component({
   selector: 'app-banner',
-  imports: [],
+  imports: [HighlightDirective],
   templateUrl: './banner.component.html',
   styleUrl: './banner.component.scss',
 })
