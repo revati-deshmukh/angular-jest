@@ -1,0 +1,17 @@
+<form [formGroup]="form" (submit)="onSubmit()">
+	<input formControlName="name" />
+	<input formControlName="email" />
+	<input formControlName="password" type="password" />
+	<select formControlName="category">
+		@for (category of categories; track category) {
+			<option [value]="category"> {{ category }} </option>
+		}
+	</select>
+
+	<select formControlName="country">
+		@for (country of countries; track country) {
+			<option [ngValue]="country.code"> {{ country.name }} </option>
+		}
+	</select>
+	<button type="submit">Register</button>
+</form>

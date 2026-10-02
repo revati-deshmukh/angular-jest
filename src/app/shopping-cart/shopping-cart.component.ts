@@ -31,11 +31,11 @@ export class ShoppingCartComponent {
     private shippingService: ShippingService,
   ) {}
 
-  // shopItems: ShopItem[] = [
-  //   { title: 'T-Shirt', price: 20, imageSrc: 'assets/cat.jpg' },
-  //   { title: 'Coffee Cup', price: 10, imageSrc: 'assets/cat1.jpg' },
-  //   { title: 'Hoodie', price: 35, imageSrc: 'assets/bird1.jpg' },
-  // ];
+  shopItems: Product[] = [
+    { id: 1, name: 'T-Shirt', price: 20, imageSrc: 'assets/cat.jpg' },
+    { id: 2, name: 'Coffee Cup', price: 10, imageSrc: 'assets/cat1.jpg' },
+    { id: 3, name: 'Hoodie', price: 35, imageSrc: 'assets/bird1.jpg' },
+  ];
 
   readonly subtotal = computed(() => {
     return this.cartItems().reduce(
